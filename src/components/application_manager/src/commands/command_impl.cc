@@ -214,5 +214,21 @@ DEPRECATED void CommandImpl::ReplaceHMIByMobileAppId(
   }
 }
 
+// static
+uint32_t CommandImpl::CalcCommandInternalConsecutiveNumber(
+    ApplicationConstSharedPtr app) {
+  LOG4CXX_AUTO_TRACE(logger_);
+  const DataAccessor<CommandsMap> accessor = app->commands_map();
+  const CommandsMap& commands = accessor.GetData();
+
+  uint32_t last_command_number = 0u;
+  if (!commands.empty()) {
+    CommandsMap::const_reverse_iterator commands_it = commands.rbegin();
+    last_command_number = commands_it->first;
+  }
+
+  return last_command_number + 1;
+}
+
 }  // namespace commands
 }  // namespace application_manager

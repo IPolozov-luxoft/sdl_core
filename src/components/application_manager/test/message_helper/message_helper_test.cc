@@ -276,10 +276,10 @@ TEST(MessageHelperTestCreate,
 
   smart_objects::SmartObject& object = *smartObjectPtr;
 
-  uint64_t app_id = 1;
-  std::string cmd_icon_value = "10";
-  int64_t cmd_id = 5;
-  uint32_t internal_id = 1;
+  const uint32_t app_id = 1u;
+  const std::string cmd_icon_value = "10";
+  const uint32_t cmd_id = 5u;
+  const uint32_t internal_id = 1u;
 
   object[strings::menu_params] = 1;
   object[strings::cmd_icon] = 1;
@@ -304,7 +304,7 @@ TEST(MessageHelperTestCreate,
 
   EXPECT_EQ(function_id, obj[strings::params][strings::function_id].asInt());
   EXPECT_EQ(app_id, obj[strings::msg_params][strings::app_id].asUInt());
-  EXPECT_EQ(cmd_id, obj[strings::msg_params][strings::cmd_id].asInt());
+  EXPECT_EQ(cmd_id, obj[strings::msg_params][strings::cmd_id].asUInt());
   EXPECT_EQ(object[strings::menu_params],
             obj[strings::msg_params][strings::menu_params]);
   EXPECT_EQ(object[strings::cmd_icon],

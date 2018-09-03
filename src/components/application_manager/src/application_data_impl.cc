@@ -41,7 +41,7 @@ CREATE_LOGGERPTR_GLOBAL(logger_, "ApplicationManager")
 
 namespace {
 struct CommandIdComparator {
-  CommandIdComparator(const std::string& key, uint32_t id)
+  CommandIdComparator(const std::string& key, const uint32_t id)
       : key_(key), target_id_(id) {}
 
   bool operator()(const CommandsMap::value_type& new_command) const {

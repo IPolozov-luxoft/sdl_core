@@ -142,15 +142,6 @@ class AddCommandRequest : public app_mngr::commands::CommandRequestImpl {
    */
   bool IsWhiteSpaceExist();
 
-  /**
-   * @brief Calculates command`s internal consecutive number used during
-   * resumption. This method is called when we add a new command.
-   * @param[in] app Application for wich a consecutive number is calculated
-   * @return internal consecutive number
-   */
-  uint32_t CalcAppInternalConsecutiveNumber(
-      app_mngr::ApplicationConstSharedPtr app) const;
-
   inline bool BothSend() const;
 
   /**
@@ -173,6 +164,6 @@ class AddCommandRequest : public app_mngr::commands::CommandRequestImpl {
 };
 
 }  // namespace commands
-}  // namespace application_manager
+}  // namespace sdl_rpc_plugin
 
 #endif  // SRC_COMPONENTS_APPLICATION_MANAGER_RPC_PLUGINS_SDL_RPC_PLUGIN_INCLUDE_SDL_RPC_PLUGIN_COMMANDS_MOBILE_ADD_COMMAND_REQUEST_H_

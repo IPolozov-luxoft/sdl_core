@@ -160,8 +160,8 @@ void AddCommandRequest::Run() {
     return;
   }
 
-  const uint32_t internal_consecutive_number =
-      CalcAppInternalConsecutiveNumber(app);
+  const uint32_t internal_consecutive_number = application_manager::commands::
+      CommandImpl::CalcCommandInternalConsecutiveNumber(app);
   app->AddCommand(internal_consecutive_number,
                   (*message_)[strings::msg_params]);
 
@@ -516,21 +516,6 @@ void AddCommandRequest::on_event(const event_engine::Event& event) {
                &(message[strings::msg_params]));
 }
 
-uint32_t AddCommandRequest::CalcAppInternalConsecutiveNumber(
-    ApplicationConstSharedPtr app) const {
-  LOG4CXX_AUTO_TRACE(logger_);
-  const DataAccessor<CommandsMap> accessor = app->commands_map();
-  const CommandsMap& commands = accessor.GetData();
-
-  uint32_t last_command_number = 0;
-  if (!commands.empty()) {
-    CommandsMap::const_reverse_iterator commands_it = commands.rbegin();
-    last_command_number = commands_it->first;
-  }
-
-  return last_command_number + 1;
-}
-
 bool AddCommandRequest::IsPendingResponseExist() {
   return send_ui_ != is_ui_received_ || send_vr_ != is_vr_received_;
 }
@@ -641,4 +626,4 @@ void AddCommandRequest::RemoveCommand() {
 
 }  // namespace commands
 
-}  // namespace application_manager
+}  // namespace sdl_rpc_plugin

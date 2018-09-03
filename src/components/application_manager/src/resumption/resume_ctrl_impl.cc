@@ -623,13 +623,14 @@ void ResumeCtrlImpl::AddCommands(ApplicationSharedPtr application,
     const smart_objects::SmartObject& app_commands =
         saved_app[strings::application_commands];
 
-    uint32_t internal_id = 1;
-    for (size_t cmd_num = 0; cmd_num < app_commands.length();
-         ++cmd_num, ++internal_id) {
+    for (size_t cmd_num = 0; cmd_num < app_commands.length(); ++cmd_num) {
       const smart_objects::SmartObject& command = app_commands[cmd_num];
       const uint32_t cmd_id = command[strings::cmd_id].asUInt();
       const bool is_resumption = true;
-      application->AddCommand(internal_id, command);
+      application->AddCommand(
+          commands::CommandImpl::CalcCommandInternalConsecutiveNumber(
+              application),
+          command);
       application->help_prompt_manager().OnVrCommandAdded(
           cmd_id, command, is_resumption);
     }

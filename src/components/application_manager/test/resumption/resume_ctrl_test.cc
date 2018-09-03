@@ -330,9 +330,9 @@ TEST_F(ResumeCtrlTest, StartResumption_AppWithCommands) {
   GetInfoFromApp();
   smart_objects::SmartObject test_application_commands;
   smart_objects::SmartObject test_commands;
-  const uint32_t count_of_commands = 20;
+  const uint32_t count_of_commands = 20u;
 
-  for (uint32_t i = 0; i < count_of_commands; ++i) {
+  for (uint32_t i = 0u; i < count_of_commands; ++i) {
     test_commands[application_manager::strings::cmd_id] = i;
     test_application_commands[i] = test_commands;
   }
@@ -354,10 +354,31 @@ TEST_F(ResumeCtrlTest, StartResumption_AppWithCommands) {
   ON_CALL(*mock_app_, help_prompt_manager())
       .WillByDefault(ReturnRef(*mock_help_prompt_manager_));
 
-  for (uint32_t cmd_id = 0, internal_id = 1; cmd_id < count_of_commands;
+  std::vector<application_manager::CommandsMap> command_vec;
+  for (uint32_t count = 0u; count <= count_of_commands; ++count) {
+    command_vec.emplace_back();
+    for (uint32_t i = 0u; i < count; ++i) {
+      command_vec[count].insert(
+          std::pair<uint32_t, smart_objects::SmartObject*>(
+              i + 1, &test_application_commands[i]));
+    };
+  }
+
+  uint32_t comm_n = 0u;
+  ON_CALL(*mock_app_, commands_map())
+      .WillByDefault(testing::Invoke(
+          [&]() -> DataAccessor<application_manager::CommandsMap> {
+            DataAccessor<application_manager::CommandsMap> data_accessor(
+                command_vec[comm_n], app_set_lock_ptr_);
+            ++comm_n;
+            return data_accessor;
+          }));
+
+  for (uint32_t cmd_id = 0u, internal_id = 1u; cmd_id < count_of_commands;
        ++cmd_id, ++internal_id) {
     EXPECT_CALL(*mock_app_,
                 AddCommand(internal_id, test_application_commands[cmd_id]));
+
     EXPECT_CALL(
         *mock_help_prompt_manager_,
         OnVrCommandAdded(cmd_id, test_application_commands[cmd_id], true));
