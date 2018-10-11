@@ -695,7 +695,7 @@ class SmartObject FINAL {
    *
    * @return CSmartSchema
    **/
-  CSmartSchema getSchema();
+  CSmartSchema getSchema()const;
 
   /**
    * @brief Returns current object type

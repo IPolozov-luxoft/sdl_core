@@ -154,7 +154,10 @@ class RPCHandlerImpl : public RPCHandler,
       ns_smart_device_link::ns_smart_objects::SmartObject& output,
       utils::SemanticVersion& message_version);
 
+ static std::set<std::string> VehicleData_invalid_params_to_remove_Set_Str_keys;
+
  private:
+  void CutOffInvalidData( ns_smart_device_link::ns_smart_objects::SmartObject& output,  smart_objects::errors::eType& validationResult);
   void ProcessMessageFromMobile(const std::shared_ptr<Message> message);
   void ProcessMessageFromHMI(const std::shared_ptr<Message> message);
   bool ConvertMessageToSO(const Message& message,

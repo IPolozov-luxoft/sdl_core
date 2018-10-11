@@ -63,5 +63,8 @@ size_t ISchemaItem::GetMemberSize() {
   return 0;
 }
 
+void ISchemaItem::setRemoveInvalidParameters(bool rvip){RemoveInvalidParameters = rvip;};
+
+bool ISchemaItem::getRemoveInvalidParameters(){return RemoveInvalidParameters;};
 }  // namespace ns_smart_objects
 }  // namespace ns_smart_device_link

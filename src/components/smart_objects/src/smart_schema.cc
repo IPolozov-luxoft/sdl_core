@@ -50,7 +50,8 @@ errors::eType CSmartSchema::validate(
 void CSmartSchema::setSchemaItem(const ISchemaItemPtr schemaItem) {
   mSchemaItem = schemaItem;
 }
-
+void CSmartSchema::setRemoveInvalidPatameter(const bool rInvParam){ mSchemaItem->setRemoveInvalidParameters(rInvParam); }
+bool CSmartSchema::getRemoveInvalidPatameter(){ return mSchemaItem->getRemoveInvalidParameters(); }
 void CSmartSchema::applySchema(SmartObject& Object,
                                const bool RemoveFakeParameters,
                                const utils::SemanticVersion& MessageVersion) {

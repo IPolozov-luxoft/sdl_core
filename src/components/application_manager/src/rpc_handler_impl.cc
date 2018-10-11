@@ -35,6 +35,39 @@
 namespace application_manager {
 namespace rpc_handler {
 
+std::set<std::string>
+RPCHandlerImpl::VehicleData_invalid_params_to_remove_Set_Str_keys{
+    strings::gps,
+    strings::speed,
+    strings::rpm,
+    strings::fuel_level,
+    strings::fuel_level_state,
+    strings::instant_fuel_consumption,
+    strings::fuel_range,
+    strings::external_temp,
+    strings::turn_signal,
+    strings::vin,
+    strings::prndl,
+    strings::tire_pressure,
+    strings::odometer,
+    strings::belt_status,
+    strings::body_information,
+    strings::device_status,
+    strings::driver_braking,
+    strings::wiper_status,
+    strings::head_lamp_status,
+    strings::engine_torque,
+    strings::acc_pedal_pos,
+    strings::steering_wheel_angle,
+    strings::engine_oil_life,
+    strings::electronic_park_brake_status,
+    strings::e_call_info,
+    strings::airbag_status,
+    strings::emergency_event,
+    strings::cluster_mode_status,
+    strings::my_key
+};
+
 CREATE_LOGGERPTR_LOCAL(logger_, "RPCHandlerImpl")
 namespace formatters = ns_smart_device_link::ns_json_handler::formatters;
 namespace jhs = ns_smart_device_link::ns_json_handler::strings;
@@ -225,6 +258,40 @@ void RPCHandlerImpl::GetMessageVersion(
   }
 }
 
+
+void RPCHandlerImpl::CutOffInvalidData( ns_smart_device_link::ns_smart_objects::SmartObject& output,  smart_objects::errors::eType& validationResult ){
+
+    ns_smart_device_link::ns_smart_objects::CSmartSchema  shema_copy_current = output.getSchema();
+    shema_copy_current.setRemoveInvalidPatameter(true);
+
+        rpc::ValidationReport report("RPC");
+        std::set<std::string>
+                setObjNamesToDelete,
+                strKeys=output[jhs::S_MSG_PARAMS].enumerate();
+        std::string context_of_PrintSmartObject;
+
+        do{
+            setObjNamesToDelete.clear();
+            report = rpc::ValidationReport("RPC");
+            validationResult = output.validate(&report);
+
+                 for(const auto& key : strKeys)
+                       if(VehicleData_invalid_params_to_remove_Set_Str_keys.find(key) != VehicleData_invalid_params_to_remove_Set_Str_keys.end())
+                           {
+                                report.validationReportToSet(setObjNamesToDelete);
+
+                                   if(false == setObjNamesToDelete.empty())
+                                       {
+                                           output[jhs::S_MSG_PARAMS][key].erase(*(setObjNamesToDelete.begin()));
+                                       }
+                           }
+                 validationResult = smart_objects::errors::OK;
+        }while(false == setObjNamesToDelete.empty());
+
+        shema_copy_current = output.getSchema();
+        shema_copy_current.setRemoveInvalidPatameter(false);
+  }
+
 bool RPCHandlerImpl::ConvertMessageToSO(
     const Message& message,
     ns_smart_device_link::ns_smart_objects::SmartObject& output) {
@@ -312,6 +379,7 @@ bool RPCHandlerImpl::ConvertMessageToSO(
       break;
     }
     case protocol_handler::MajorProtocolVersion::PROTOCOL_VERSION_HMI: {
+
 #ifdef ENABLE_LOG
       int32_t result =
 #endif
@@ -322,24 +390,39 @@ bool RPCHandlerImpl::ConvertMessageToSO(
                     "Convertion result: "
                         << result << " function id "
                         << output[jhs::S_PARAMS][jhs::S_FUNCTION_ID].asInt());
+
       if (!hmi_so_factory().attachSchema(output, false)) {
         LOG4CXX_WARN(logger_, "Failed to attach schema to object.");
         return false;
       }
 
-      rpc::ValidationReport report("RPC");
+     smart_objects::errors::eType validationResult;
+     std::set<std::string> strKeys=output[jhs::S_MSG_PARAMS].enumerate();
 
-      if (output.validate(&report) != smart_objects::errors::OK) {
+for(const auto& key : strKeys)
+      if(VehicleData_invalid_params_to_remove_Set_Str_keys.find(key) != VehicleData_invalid_params_to_remove_Set_Str_keys.end())
+          {
+              CutOffInvalidData(output,  validationResult );
+              break;
+          }
+
+  rpc::ValidationReport report("RPC");
+ validationResult =  output.validate(&report);
+
+
+      if (validationResult != smart_objects::errors::OK) {
         LOG4CXX_ERROR(logger_,
                       "Incorrect parameter from HMI"
                           << rpc::PrettyFormat(report));
 
+        LOG4CXX_DEBUG(logger_, "this a Message is after output.validate(&report) heppenned");
+        MessageHelper::PrintSmartObject(output);        
         output.erase(strings::msg_params);
         output[strings::params][hmi_response::code] =
             hmi_apis::Common_Result::INVALID_DATA;
         output[strings::msg_params][strings::info] = rpc::PrettyFormat(report);
         return false;
-      }
+      }      
       break;
     }
     case protocol_handler::MajorProtocolVersion::PROTOCOL_VERSION_1: {

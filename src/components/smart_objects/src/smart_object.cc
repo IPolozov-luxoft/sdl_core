@@ -883,7 +883,7 @@ void SmartObject::setSchema(const CSmartSchema& schema) {
   m_schema = schema;
 }
 
-CSmartSchema SmartObject::getSchema() {
+CSmartSchema SmartObject::getSchema()const {
   return m_schema;
 }
 

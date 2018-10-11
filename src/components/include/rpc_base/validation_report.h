@@ -35,13 +35,14 @@
 
 #include <string>
 #include <list>
+#include <set>
 
 namespace rpc {
 
 class ValidationReport;
 typedef std::list<ValidationReport> ValidationReports;
-
-class ValidationReport {
+typedef std::set<std::string> IvalidDataObjectsSet;
+class  ValidationReport {
  public:
   explicit ValidationReport(const std::string& object_name);
   const std::string& object_name() const;
@@ -49,12 +50,15 @@ class ValidationReport {
   void set_validation_info(const std::string& info);
   const ValidationReports& subobject_reports() const;
   ValidationReport& ReportSubobject(const std::string& object_name);
+  void validationReportToSet(IvalidDataObjectsSet& set_to_accumulate)const;
 
  private:
   std::string object_name_;
   std::string validation_info_;
   ValidationReports subobject_reports_;
+
 };
+
 
 std::string PrettyFormat(const ValidationReport& report);
 
@@ -88,6 +92,9 @@ inline void PrettyFormat(const ValidationReport& report,
 }
 }  // namespace impl
 
+
+
+
 inline ValidationReport::ValidationReport(const std::string& object_name)
     : object_name_(object_name) {}
 
@@ -118,6 +125,20 @@ inline std::string PrettyFormat(const ValidationReport& report) {
   std::string result;
   impl::PrettyFormat(report, "", &result);
   return result;
+}
+
+inline
+void  ValidationReport::validationReportToSet(IvalidDataObjectsSet& set_to_accumulate)const
+{
+      if( false == validation_info().empty() )
+      {
+          set_to_accumulate.insert(object_name());
+      }
+
+        for(auto& vrep : subobject_reports())
+            {
+              vrep.validationReportToSet(set_to_accumulate);
+            }
 }
 
 }  // namespace rpc

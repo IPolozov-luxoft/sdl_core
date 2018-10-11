@@ -108,7 +108,7 @@ errors::eType CObjectSchemaItem::validate(
     const SmartObject& object,
     rpc::ValidationReport* report__,
     const utils::SemanticVersion& MessageVersion) {
-  if (SmartType_Map != object.getType()) {
+  if (SmartType_Map != object.getType()) {      
     std::string validation_info = "Incorrect type, expected: " +
                                   SmartObject::typeToString(SmartType_Map) +
                                   ", got: " +
@@ -116,8 +116,8 @@ errors::eType CObjectSchemaItem::validate(
     report__->set_validation_info(validation_info);
     return errors::INVALID_VALUE;
   }
-
-  std::set<std::string> object_keys = object.enumerate();
+        std::set<std::string> object_keys = object.enumerate();
+        errors::eType common_result = errors::OK ;
 
   for (Members::const_iterator it = mMembers.begin(); it != mMembers.end();
        ++it) {
@@ -135,18 +135,27 @@ errors::eType CObjectSchemaItem::validate(
       }
       continue;
     }
-    const SmartObject& field = object.getElement(key);
 
-    errors::eType result = errors::OK;
+  bool   ifRemoveInvalidPatameter=(object.getSchema().getRemoveInvalidPatameter());
+
+    const SmartObject& field = object.getElement(key);
+    errors::eType result = errors::OK ;
+
     // Check if MessageVersion matches schema version
     result = correct_member.mSchemaItem->validate(
         field, &report__->ReportSubobject(key), MessageVersion);
     if (errors::OK != result) {
+
+        if(!ifRemoveInvalidPatameter) {
       return result;
+        }
+        else{
+        common_result = result;
+        }
     }
     object_keys.erase(key_it);
   }
-  return errors::OK;
+  return common_result;
 }
 
 void CObjectSchemaItem::applySchema(

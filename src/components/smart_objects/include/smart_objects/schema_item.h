@@ -119,9 +119,16 @@ class ISchemaItem {
    *
    * @return value of any parameter
    */
+
+    void setRemoveInvalidParameters(bool rvip);
+
+    bool getRemoveInvalidParameters();
+
   virtual size_t GetMemberSize();
 
   virtual ~ISchemaItem() {}
+private:
+    bool RemoveInvalidParameters = false;
 };
 typedef std::shared_ptr<ISchemaItem> ISchemaItemPtr;
 }  // namespace ns_smart_objects

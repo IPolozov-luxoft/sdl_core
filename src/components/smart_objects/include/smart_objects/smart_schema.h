@@ -79,6 +79,8 @@ class CSmartSchema FINAL {
    * @param SchemaItem Root schema item.
    */
   void setSchemaItem(const ISchemaItemPtr SchemaItem);
+  void setRemoveInvalidPatameter(bool rInvParam);
+  bool getRemoveInvalidPatameter();
 
   /**
    * @brief Apply schema.

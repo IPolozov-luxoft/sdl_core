@@ -151,14 +151,13 @@ class CObjectSchemaItem : public ISchemaItem {
    *                describing the object member.
    **/
   CObjectSchemaItem(const Members& Members);
-
   /**
    * @brief Removes fake parameters from object.
    * @param Object Object to remove fake parameters.
-   **/
+   **/  
+
   void RemoveFakeParams(SmartObject& Object,
                         const utils::SemanticVersion& MessageVersion);
-
   /**
    * @brief Returns the correct schema item based on message version.
    * @param member Schema member
